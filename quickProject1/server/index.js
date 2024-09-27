@@ -12,7 +12,7 @@ mongoose.connect('mongodb://localhost:27017/rateLimiter').then(()=>{
 
 const RateLimit = require('./models/RateLimit'); // this is a mongoose model
 const rateLimiter = async (req, res, next) => {
-    const userId = req.query.userId;
+    const userId = req.query.userId; // it retrives from the url 
 
     // Check if userId is provided
     if (!userId) {
@@ -37,15 +37,16 @@ const rateLimiter = async (req, res, next) => {
                 return res.status(429).json({
                     message: 'Too many requests. Try again later'
                 });
+            }else{
+                user.requestCount++;
             }
-            user.requestCount++;
         } else {
             // Resetting the count after the time window has passed
             user.requestCount = 1;
             user.firstRequest = Date.now();
         }
     }
-    await user.save();
+    await user.save(); // here we are waiting till the save method is executed
     next();
 }
 
